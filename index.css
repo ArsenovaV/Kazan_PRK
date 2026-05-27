@@ -1,0 +1,592 @@
+/* =============================================
+   БАЗОВЫЕ СТИЛИ
+   ============================================= */
+
+/* Ширина панелей — CSS-переменная, чтобы не дублировать значение */
+:root {
+  --panel-width: 25vw;
+  --panel-min-width: 240px;
+}
+
+.body {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background-color: var(--color-white);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  font-family: var(--font-inter);
+  line-height: normal;
+  letter-spacing: normal;
+}
+
+/* =============================================
+   ШАПКА
+   ============================================= */
+.head-box {
+  align-self: stretch;
+  background-color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px var(--padding-60);
+  gap: var(--gap-20);
+  flex-shrink: 0;
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.name { display: flex; align-items: center; gap: 15px; }
+.tree-icon { height: 52px; width: 52px; flex-shrink: 0; }
+.div { font-size: var(--fs-24); font-weight: 600; color: var(--Color-5); }
+.span { font-size: 14px; font-weight: 400; color: #888; display: block; margin-top: 2px; }
+
+/* Поисковая строка */
+.search-box {
+  display: flex;
+  flex-direction: column;
+  min-width: 340px;
+  max-width: 440px;
+  flex-shrink: 0;
+  position: relative;
+}
+.search { display: flex; flex-direction: column; gap: 4px; }
+.div2 { font-size: 11px; color: #aaa; }
+
+.search-panel {
+  height: 44px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.search-rect { position: absolute; inset: 0; z-index: 0; }
+.search-rect-child {
+  width: 100%; height: 100%;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--color-darkgray);
+  box-shadow: 0 2px 6px rgba(163,184,184,0.2);
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.search-panel:focus-within .search-rect-child { border-color: var(--Color); }
+
+.search-items {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 10px; width: 100%; box-sizing: border-box;
+}
+.lupa-icon { height: 18px; width: 18px; cursor: pointer; opacity: 0.5; flex-shrink: 0; transition: opacity 0.15s; }
+.lupa-icon:hover { opacity: 1; }
+.input {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-family: var(--font-inter); font-size: var(--fs-14); color: var(--Color-5); min-width: 0;
+}
+.input::placeholder { color: #bbb; }
+.cross-box-icon {
+  height: 18px; width: 18px; cursor: pointer; border: none; background: transparent;
+  opacity: 0; pointer-events: none; transition: opacity 0.15s; flex-shrink: 0;
+}
+.cross-box-icon.visible { opacity: 0.4; pointer-events: auto; }
+.cross-box-icon.visible:hover { opacity: 0.9; }
+
+/* Выпадающий список геокодера */
+#geocoder-results {
+  position: absolute;
+  top: calc(100% + 4px); left: 0; right: 0;
+  background: #fff;
+  border: 1px solid #ddd; border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  z-index: 1000; display: none;
+  max-height: 220px; overflow-y: auto;
+}
+#geocoder-results.visible { display: block; }
+.geocoder-result-item {
+  padding: 9px 14px; font-size: 13px; color: #333;
+  cursor: pointer; border-bottom: 1px solid #f2f2f2; line-height: 1.4;
+}
+.geocoder-result-item:last-child { border-bottom: none; }
+.geocoder-result-item:hover { background: #f4f7e8; color: var(--Color); }
+
+/* =============================================
+   РАБОЧАЯ ОБЛАСТЬ
+   ============================================= */
+.filter-panel {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  position: relative;
+}
+
+/* =============================================
+   БОКОВЫЕ ПАНЕЛИ — ВЫЕЗЖАЮЩИЕ (ширина = 25vw)
+   ============================================= */
+.left-panel,
+.right-panel {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: var(--panel-width);
+  min-width: var(--panel-min-width);
+  background: var(--color-white);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* Левая: уезжает влево на свою ширину */
+.left-panel {
+  left: 0;
+  transform: translateX(calc(-1 * var(--panel-width)));
+  border-right: 1px solid #e8e8e8;
+  box-shadow: 3px 0 16px rgba(0,0,0,0.08);
+  padding: 20px 20px 20px 24px;
+}
+.left-panel.open { transform: translateX(0); }
+
+/* Правая: уезжает вправо */
+.right-panel {
+  right: 0;
+  transform: translateX(var(--panel-width));
+  border-left: 1px solid #e8e8e8;
+  box-shadow: -3px 0 16px rgba(0,0,0,0.08);
+  padding: 20px;
+}
+.right-panel.open { transform: translateX(0); }
+
+/* =============================================
+   КНОПКИ-СТРЕЛКИ ПАНЕЛЕЙ
+   ============================================= */
+.panel-toggle {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 101;
+  background: var(--color-white);
+  border: 1px solid #e0e0e0;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.12);
+  width: 26px; height: 52px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #666;
+  /* Кнопка едет вместе с панелью */
+  transition: left 0.3s ease, right 0.3s ease, color 0.15s;
+  padding: 0; line-height: 1;
+}
+.panel-toggle:hover { color: var(--Color); }
+
+#toggle-left { left: 0; border-radius: 0 8px 8px 0; border-left: none; }
+/* При открытой левой панели — кнопка на её правом крае */
+#toggle-left.open { left: var(--panel-width); }
+
+#toggle-right { right: 0; border-radius: 8px 0 0 8px; border-right: none; }
+/* При открытой правой панели — кнопка на её левом крае */
+#toggle-right.open { right: var(--panel-width); }
+
+/* =============================================
+   КАРТА
+   ============================================= */
+.map-parent { position: absolute; inset: 0; z-index: 0; }
+#map { width: 100%; height: 100%; }
+
+/* Скрываем дефолтные контролы MapLibre */
+.maplibregl-ctrl-top-right,
+.maplibregl-ctrl-bottom-right,
+.maplibregl-ctrl-bottom-left { display: none !important; }
+
+/* Кнопки зума — сдвигаются при открытии правой панели */
+.zoom-control {
+  position: absolute;
+  top: 12px;
+  right: 12px;  /* исходная позиция */
+  border-radius: 4px;
+  background: var(--color-white);
+  display: flex; flex-direction: column;
+  padding: 2px; gap: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 5;
+  /* Плавный сдвиг вместе с правой панелью */
+  transition: right 0.3s ease;
+}
+/* Когда правая панель открыта — кнопки уходят левее */
+.zoom-control.shifted {
+  right: calc(var(--panel-width) + 12px);
+}
+
+.zoom-control-zoom-in-icon {
+  width: 26px; height: 26px;
+  cursor: pointer; display: block;
+  transition: opacity 0.15s;
+}
+.zoom-control-zoom-in-icon:hover { opacity: 0.6; }
+
+/* =============================================
+   МАСШТАБНАЯ ЛИНЕЙКА
+   ============================================= */
+.russian-scale-control {
+  position: absolute !important;
+  bottom: 12px;
+  right: 12px;
+  background: var(--color-white);
+  padding: 8px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  transition: right 0.3s ease;
+}
+
+.russian-scale-control.shifted {
+  right: calc(var(--panel-width) + 12px);
+}
+
+.russian-scale-line {
+  height: 2px;
+  background: #303030;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.russian-scale-line::before,
+.russian-scale-line::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 8px;
+  background: #303030;
+}
+
+.russian-scale-line::before { left: 0; }
+.russian-scale-line::after { right: 0; }
+
+.russian-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--Color-5);
+  line-height: 1;
+  gap: 4px;
+}
+
+.russian-scale-labels span:last-child {
+  text-align: right;
+  min-width: 30px;
+}
+
+/* =============================================
+   СОДЕРЖИМОЕ ЛЕВОЙ ПАНЕЛИ
+   ============================================= */
+.frame-parent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Строка слоя: [глазик] [квадрат-цвет] [название] [стрелка?] */
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Цветной квадрат в легенде */
+.layer-dot {
+  height: 18px; width: 32px;
+  border-radius: 2px; border: 1px solid #000;
+  box-sizing: border-box; flex-shrink: 0;
+}
+
+.layer-name { font-size: 12px; color: var(--Color-5); line-height: 1.3; flex: 1; }
+
+/* Стрелка раскрытия списка категорий */
+.expand-down-icon {
+  height: 20px; width: 20px;
+  cursor: pointer; border: none; background: transparent;
+  flex-shrink: 0; transition: transform 0.25s;
+}
+.expand-down-icon.open { transform: rotate(180deg); }
+
+/* =============================================
+   ГЛАЗИК — ПЕРЕКЛЮЧАТЕЛЬ ВИДИМОСТИ
+   ============================================= */
+.eye-btn {
+  position: relative;
+  width: 24px; height: 24px;
+  cursor: pointer; flex-shrink: 0;
+}
+.eye-svg {
+  width: 24px; height: 24px;
+  display: block;
+  transition: opacity 0.2s;
+}
+
+/* Выключенное состояние: глазик серый + диагональная полоса */
+.eye-btn.off .eye-svg { opacity: 0.2; }
+.eye-btn.off::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: -1px; right: -1px;
+  height: 2px;
+  background: #888; border-radius: 1px;
+  transform: rotate(-40deg);
+  transform-origin: center;
+}
+
+/* =============================================
+   СПИСОК КАТЕГОРИЙ ПРК
+   ============================================= */
+/* Контейнер списка категорий */
+.filter-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  max-height: 800px;
+  transition: max-height 0.3s ease;
+}
+.filter-pair.collapsed { max-height: 0; }
+
+/* Строка "включить / выключить все" */
+.cat-all-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Сдвиг вправо на ширину глазика родительской строки */
+  padding-left: 32px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 2px;
+}
+.cat-all-label {
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+  user-select: none;
+}
+.cat-all-label:hover { color: var(--Color); }
+
+/* Строка отдельной категории */
+.category-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Отступ: сдвигаем на ширину глазика родителя, чтобы иконки выровнялись */
+  padding-left: 32px;
+}
+
+/* Квадрат-цвет категории */
+.cat-dot {
+  height: 18px; width: 32px;
+  border-radius: 2px; border: 1px solid #000;
+  box-sizing: border-box; flex-shrink: 0;
+}
+
+.cat-label { font-size: 12px; color: var(--Color-5); line-height: 1.3; }
+
+/* =============================================
+   ПРАВАЯ ПАНЕЛЬ
+   ============================================= */
+/* Делаем правую панель вертикальным контейнером,
+   чтобы блоки шли друг под другом, а инструмент можно
+   было прижать к низу через margin-top: auto */
+
+.right-panel {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+
+/* ---- Блок статистики ---- */
+.stats-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-card {
+  padding: 14px 12px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Широкая карточка — более выраженная, с акцентным фоном */
+.stat-card-wide {
+  padding: 18px 14px;
+  background: #f4f7e8;
+  border-color: #d8e0b8;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--Color);
+  line-height: 1.1;
+  font-family: var(--font-inter);
+  margin-bottom: 6px;
+  white-space: nowrap;          /* число и единица всегда в одной строке */
+}
+
+.stat-card-wide .stat-value {
+  font-size: 36px;
+}
+
+/* Единица измерения рядом с числом — тоньше и меньше */
+.stat-unit {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
+  margin-left: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #888;
+  line-height: 1.3;
+}
+
+.stat-card-wide .stat-label {
+  font-size: 13px;
+  color: #666;
+}
+
+/* =============================================
+   ИНСТРУМЕНТ: ДОБАВЛЕНИЕ ОБЪЕКТА
+   ============================================= */
+.tool-block {
+  margin-top: auto;            /* прижимаем к низу панели */
+  padding: 16px;
+  padding-bottom: 30px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+.tool-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--Color-5);
+  letter-spacing: 0.2px;
+}
+
+.tool-hint {
+  margin: 0;
+  font-size: 12px;
+  color: #888;
+  line-height: 1.4;
+}
+
+.tool-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* Обёртка нужна, чтобы позиционировать крестик поверх select-а */
+.tool-select-wrap {
+  position: relative;
+  flex: 1;
+}
+
+.tool-select {
+  width: 100%;
+  height: 36px;
+  padding: 0 32px 0 10px;       /* справа резерв под крестик */
+  font-family: var(--font-inter);
+  font-size: 13px;
+  color: var(--Color-5);
+  background: #fff;
+  border: 1px solid var(--color-darkgray);
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+.tool-select:focus { border-color: var(--Color); }
+
+/* Крестик-сброс (по аналогии с .cross-box-icon в поиске) */
+.tool-select-clear {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  color: #888;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s, color 0.15s;
+  padding: 0;
+}
+.tool-select-clear.visible {
+  opacity: 0.6;
+  pointer-events: auto;
+}
+.tool-select-clear.visible:hover {
+  opacity: 1;
+  color: var(--Color);
+}
+
+.population-display {
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.population-label {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.population-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--Color);
+  line-height: 1.1;
+  font-family: var(--font-inter);
+}
+
+/* =============================================
+   АДАПТИВ
+   ============================================= */
+@media screen and (max-width: 1200px) {
+  .head-box { padding-left: var(--padding-30); padding-right: var(--padding-30); }
+  :root { --panel-width: 30vw; }
+}
+@media screen and (max-width: 800px) {
+  .head-box { flex-wrap: wrap; padding: 12px 16px; }
+  .search-box { min-width: 100%; }
+  :root { --panel-width: 75vw; }
+}
+

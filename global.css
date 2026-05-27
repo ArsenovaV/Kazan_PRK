@@ -1,0 +1,76 @@
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+:root {
+  /* Figma Variables */
+
+  /* Color */
+  --Color: #424f08;
+  --Color-5: #303030;
+
+  /* Common Style Variables */
+
+  /* Color */
+  --color-black: #000;
+  --color-brown: #a33723;
+  --color-darkgoldenrod: #a27d00;
+  --color-darkgray: #a3b8b8;
+  --color-darkolivegreen-100: #536205;
+  --color-darkolivegreen-200: #594501;
+  --color-darkolivegreen-300: rgba(66, 79, 8, 0.44);
+  --color-darkslategray: #2d644a;
+  --color-goldenrod: #ebb609;
+  --color-hotpink: #ff6e9e;
+  --color-khaki: #f5dd90;
+  --color-mediumaquamarine: #90dac2;
+  --color-palegoldenrod: #ceda91;
+  --color-palevioletred: #ad375e;
+  --color-pink: #ffc7d9;
+  --color-sienna: #6a3434;
+  --color-thistle: #d1c9f6;
+  --color-white: #fff;
+  --color-yellowgreen: #9db522;
+
+  /* Gap */
+  --gap-4: 4px;
+  --gap-5: 5px;
+  --gap-10: 10px;
+  --gap-20: 20px;
+
+  /* Padding */
+  --padding-0: 0px;
+  --padding-01: 0;
+  --padding-3: 3px;
+  --padding-20: 20px;
+  --padding-30: 30px;
+  --padding-60: 60px;
+
+  /* BorderRadius */
+  --br-2: 2px;
+
+  /* Font */
+  --font-inter: Inter;
+
+  /* FontSize */
+  --fs-12: 12px;
+  --fs-14: 14px;
+  --fs-19: 19px;
+  --fs-24: 24px;
+
+  /* Borders */
+  --border-1: 1px solid var(--color-black);
+
+  /* WidthHeights */
+  --height-15: 15px;
+  --height-18: 18px;
+  --height-24: 24px;
+  --height-100: 100px;
+  --width-18: 18px;
+  --width-24: 24px;
+  --width-32: 32px;
+  --width-60: 60px;
+  --width-280: 280px;
+  --width-400: 400px;
+}

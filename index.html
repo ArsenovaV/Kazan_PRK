@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1, width=device-width" />
+  <title>Казань — Природно-рекреационный каркас</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="./global.css" />
+  <link rel="stylesheet" href="./index.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
+</head>
+<body>
+<div class="body">
+
+  <!-- ======================================================
+       ШАПКА
+       ====================================================== -->
+  <section class="head-box">
+    <div class="name">
+      <img class="tree-icon" alt="" src="./public/Tree.svg" />
+      <div class="div">
+        <span>Казан Табигый-Рекреацион Каркас<br /></span>
+        <span class="span">Доступность природно-рекреационного каркаса Казани</span>
+      </div>
+    </div>
+
+    <!-- Поисковая строка (геокодер Nominatim) -->
+    <div class="search-box">
+      <div class="search">
+        <div class="div2">Поиск объекта</div>
+        <div class="search-panel">
+          <div class="search-rect"><div class="search-rect-child"></div></div>
+          <div class="search-items">
+            <img id="geocoder-btn" class="lupa-icon" alt="Найти" src="./public/lupa.svg" />
+            <input id="geocoder-input" class="input" placeholder="Казань, Татарстан" type="text" autocomplete="off" />
+            <img id="geocoder-clear" class="cross-box-icon" alt="Очистить" src="./public/cross-box.svg" />
+          </div>
+        </div>
+        <div id="geocoder-results"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================
+       РАБОЧАЯ ОБЛАСТЬ
+       ====================================================== -->
+  <main class="filter-panel">
+
+    <!-- ---- Левая панель: легенда слоёв ---- -->
+    <section class="left-panel open" id="panel-left">
+      <div class="frame-parent">
+
+        <!-- == Зеленые зоны (с кнопкой раскрытия категорий) == -->
+        <div class="layer-row">
+          <div class="eye-btn" id="eye-prk" title="Показать / скрыть слой">
+            <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4" fill="#303030"/>
+              <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="layer-dot" style="background:#2d644a;"></div>
+          <span class="layer-name">Зеленые зоны</span>
+          <img id="prk-expand" class="expand-down-icon" alt="" src="./public/Expand-down.svg" />
+        </div>
+
+        <!-- Список категорий ПРК — строки генерируются в main.js -->
+        <div id="prk-categories" class="filter-pair collapsed"></div>
+
+        <!-- == Буферы доступности == -->
+        <div class="layer-row">
+          <div class="eye-btn off" id="eye-buffer" title="Показать / скрыть слой">
+            <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4" fill="#303030"/>
+              <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="layer-dot" style="background:rgba(66,79,8,0.4); border:1px dashed #424f08;"></div>
+          <span class="layer-name">Буферы доступности зеленых зон</span>
+        </div>
+
+        <!-- == Изохроны доступности == -->
+        <div class="layer-row">
+          <div class="eye-btn off" id="eye-iso" title="Показать / скрыть слой">
+            <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4" fill="#303030"/>
+              <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="layer-dot" style="background:rgba(30,130,180,0.25); border:1px dashed #1e82b4;"></div>
+          <span class="layer-name">Изохроны доступности зеленых зон</span>
+        </div>
+
+        <!-- == Обеспеченность жилых территорий == -->
+        <div class="layer-row">
+          <div class="eye-btn off" id="eye-obesp" title="Показать / скрыть слой">
+            <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4" fill="#303030"/>
+              <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+            </svg>
+          </div>
+          <span class="layer-name">Обеспеченность жилых территорий зелеными зонами</span>
+        </div>
+        <div class="category-row">
+          <div class="cat-dot" style="background:rgba(77,39,11,0.6); border-color:#4D270B;"></div>
+          <span class="cat-label">Высокая</span>
+        </div>
+        <div class="category-row">
+          <div class="cat-dot" style="background:rgba(161,111,76,0.6); border-color:#A16F4C;"></div>
+          <span class="cat-label">Средняя</span>
+        </div>
+        <div class="category-row">
+          <div class="cat-dot" style="background:rgba(216,164,127,0.6); border-color:#D8A47F;"></div>
+          <span class="cat-label">Низкая / не обеспечены</span>
+        </div>
+
+        <!-- == Приоритетные зоны == -->
+        <div class="layer-row">
+          <div class="eye-btn off" id="eye-priority" title="Показать / скрыть слой">
+            <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4" fill="#303030"/>
+              <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="layer-dot" style="background:rgba(180,30,30,0.12); border:2px dashed #b41e1e;"></div>
+          <span class="layer-name">Приоритетные территории для увеличения доступности зеленых зон</span>
+        </div>
+
+        <!-- == Численность населения == -->
+        <div class="layer-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+          <div style="display:flex;align-items:center;gap:6px;width:100%;">
+            <div class="eye-btn off" id="eye-density" title="Показать / скрыть слой">
+              <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="4" fill="#303030"/>
+                <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+              </svg>
+            </div>
+            <span class="layer-name">Численность населения</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;padding-left:24px;width:calc(100% - 24px);">
+            <span style="font-size:10px;color:#666;white-space:nowrap;">Низкая</span>
+            <div style="flex:1;height:8px;border-radius:3px;background:linear-gradient(to right,rgba(245,221,209,0.85),rgba(213,138,136,0.85),rgba(166,121,126,0.9));border:1px solid rgba(0,0,0,0.12);"></div>
+            <span style="font-size:10px;color:#666;white-space:nowrap;">Высокая</span>
+          </div>
+        </div>
+
+        <!-- == Картодиаграммы == -->
+        <div class="layer-row">
+          <div class="eye-btn off" id="eye-pie" title="Показать / скрыть диаграммы">
+            <svg class="eye-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="4" fill="#303030"/>
+              <path d="M21 12C21 12 20 4 12 4C4 4 3 12 3 12" stroke="#303030" stroke-width="2"/>
+            </svg>
+          </div>
+          <svg width="22" height="16" viewBox="0 0 22 16" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:6px;">
+            <rect width="22" height="16" rx="2" fill="#A16F4C" fill-opacity="0.85"/>
+            <g transform="translate(11,8)">
+              <path d="M0,0 L0,-5 A5,5 0 0,1 4.33,2.5 Z" fill="#536205" fill-opacity="0.9"/>
+              <path d="M0,0 L4.33,2.5 A5,5 0 0,1 -4.33,2.5 Z" fill="#9db522" fill-opacity="0.9"/>
+              <path d="M0,0 L-4.33,2.5 A5,5 0 0,1 0,-5 Z" fill="#ad375e" fill-opacity="0.9"/>
+            </g>
+          </svg>
+          <span class="layer-name">Отношение видов объектов, обслуживающих зеленые зоны</span>
+        </div>
+
+        <!-- == Граница города (не переключается) == -->
+        <div class="layer-row" style="pointer-events:none;">
+          <div style="width:18px;flex-shrink:0;"></div>
+          <svg width="28" height="4" style="flex-shrink:0;margin-right:6px;" viewBox="0 0 28 4">
+            <line x1="0" y1="2" x2="28" y2="2" stroke="#000" stroke-width="2"/>
+          </svg>
+          <span class="layer-name">Граница города Казань</span>
+        </div>
+
+        <!-- == Граница исследуемой территории (не переключается) == -->
+        <div class="layer-row" style="pointer-events:none;">
+          <div style="width:18px;flex-shrink:0;"></div>
+          <svg width="28" height="4" style="flex-shrink:0;margin-right:6px;" viewBox="0 0 28 4">
+            <line x1="0" y1="2" x2="28" y2="2" stroke="#000" stroke-width="1.2" stroke-dasharray="4,3"/>
+          </svg>
+          <span class="layer-name">Граница исследуемой территории</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Кнопка-стрелка левой панели -->
+    <button class="panel-toggle open" id="toggle-left" aria-label="Слои">‹</button>
+
+    <!-- ---- Карта ---- -->
+    <div class="map-parent">
+      <div id="map"></div>
+      <!-- Кнопки зума, сдвигаются при открытии правой панели -->
+      <div class="zoom-control" id="zoom-control">
+        <img id="zoom-in"  class="zoom-control-zoom-in-icon" alt="+" src="./public/zoom-control-zoom-in.svg" />
+        <img id="zoom-out" class="zoom-control-zoom-in-icon" alt="-" src="./public/zoom-control-zoom-out.svg" />
+      </div>
+      <!-- Масштабная линейка -->
+      <div id="scale-bar"></div>
+    </div>
+
+    <!-- Кнопка-стрелка правой панели -->
+    <button class="panel-toggle" id="toggle-right" aria-label="Информация">‹</button>
+
+    <!-- ---- Правая панель: справочный текст + инструмент ---- -->
+    <section class="right-panel" id="panel-right">
+      <div class="stats-block">
+        <!-- Главная цифра на всю ширину -->
+        <div class="stat-card stat-card-wide">
+          <div class="stat-value">69%</div>
+          <div class="stat-label">населения в зоне доступности</div>
+        </div>
+
+        <!-- Сетка 2×2 -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">800<span class="stat-unit">тыс. чел</span></div>
+            <div class="stat-label">население в зоне рассмотрения</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">548<span class="stat-unit">тыс. чел</span></div>
+            <div class="stat-label">население в зоне доступности ПРК</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">277</div>
+            <div class="stat-label">объектов ПРК</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">484<span class="stat-unit">га</span></div>
+            <div class="stat-label">общая площадь объектов ПРК</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Инструмент: добавление нового объекта -->
+      <div class="tool-block" id="add-object-tool">
+        <h3 class="tool-title">Добавление нового объекта</h3>
+        <p class="tool-hint">Выберите тип объекта ПРК и кликните на карту</p>
+
+        <div class="tool-row">
+          <div class="tool-select-wrap">
+            <select id="object-type-select" class="tool-select">
+              <option value="">— тип объекта —</option>
+              <option value="park">Парк</option>
+              <option value="garden">Сад</option>
+              <option value="square">Сквер</option>
+              <option value="boulevard">Бульвар</option>
+            </select>
+            <button id="object-type-clear" class="tool-select-clear" type="button" aria-label="Сбросить">×</button>
+          </div>
+        </div>
+
+        <div class="population-display">
+          <div class="population-label">Население в зоне доступности</div>
+          <div class="population-value" id="population-count">—</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+<script src="./main.js"></script>
+</body>
+</html>
